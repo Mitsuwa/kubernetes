@@ -212,6 +212,21 @@ func IsJobFinished(j *batchv1.Job) bool {
 	return isFinished
 }
 
+func getFailedStatus(j *batchv1.Job) (bool, batchv1.JobConditionType) {
+	for _, c := range j.Status.Conditions {
+		if c.Type == batchv1.JobFailed && c.Status == v1.ConditionTrue {
+			return true, c.Type
+		}
+	}
+
+	return false, ""
+}
+
+func IsJobFailed(j *batchv1.Job) bool {
+	isFailed, _ := getFailedStatus(j)
+	return isFailed
+}
+
 // byJobStartTime sorts a list of jobs by start timestamp, using their names as a tie breaker.
 type byJobStartTime []batchv1.Job
 
